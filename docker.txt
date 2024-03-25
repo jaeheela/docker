@@ -1,0 +1,63 @@
+App Store -> program -> process
+Docker Hub -> image -> container
+
+
+Docker Hub > Explore > Containers > 아파치웹서버 프로그램을 컨테이너 위에서 실행 시킬 것임 > 아파치웹서버가 설치된 컨테이너(httpd)
+docs.docker.com > docker CLI > docker pull
+
+
+명령어
+# docker pull httpd (httpd 이미지 다운)
+# docker images (httpd 이미지 다운 잘 받았는지 확인)
+# docker run --name ws1 httpd(이미지를 컨테이너로 만듦, 여러 컨테이너로 만들 수 있기 때문에 이름 지정 가능)
+# ocker run --name ws2 httpd
+# docker ps(만든 컨테이너 확인)
+# docker stop ws2(실행 중인 컨테이너 중지)
+# docker start ws2(실행 중인 컨테이너 재실행)
+# docker logs ws2(ws2 컨테이너 로그 확인)
+# docker logs -f ws2(ws2 컨테이너 로그 실시간 확인)
+# docker rm ws2(ws2 컨테이너 제거)
+# docker rm --force ws2(ws2 컨테이너 강제 제거)
+# docker rmi httpd (httpd 이미지 제거)
+
+<컴퓨터에 웹서버를 직접 설치한 경우>
+Web browser : http://example.com:80/index.html 요청
+- example.com > Web Server(웹서버는 80 포트에서 대기 중) > file System : user/local/apache2/htdocs/index.html
+
+<Docker를 이용해 Container에 웹서버가 설치된 경우>
+Web browser : http://example.com:80/index.html 요청
+- Docker Host(컨테이너 설치된 운영체제) > file System
+- Docker Host(컨테이너 설치된 운영체제) > 다수의 container(ws1) > Web Server(웹서버는 80 포트에서 대기 중) > file System : user/local/apache2/htdocs/index.html 
+- Docker Host의 80번 포트와 Container의 80번 포트 연결!! => 포트포워딩
+# docker run httpd
+# docker run -p (호스트의 포트):(컨테이너의 포트) httpd
+# docker run -p 80:80 httpd (포트포워딩)
+
+
+Web browser : http://localhost:8080/index.html 요청
+# docker run -p 8080:80 httpd
+
+
+Web browser : http://localhost:8081/index.html 요청
+# docker run --name ws3 -p 8081:80 httpd
+
+
+<컨테이너의 들어있는 index.html 수정법>
+# docker exec ws3 pwd
+# docker exec ws3 ls
+...
+# docker exec -it ws3 /bin/sh   (ws3 컨테이너 대상으로 명령 내리기 가능해짐)
+# docker exec -it ws3 /bin/bash 
+# pwd
+# ls
+# cd /usr/local/apache2/htdocs/
+# ls
+# apt update
+# apt install nano
+
+<호스트와 컨테이너의 파일 시스템 연결>
+호스트의 파일시스템 : /Desktop/htdocs/index.html
+컨테이너의 파일시스템 : /usr/local/apache2/htdocs/index.html
+# ddocker run -p 8888:80 -v ~/Desktop/htdocs/:/usr/local/apache2/htdocs/ httpd
+
+Https://seomal.com/map/1/129
