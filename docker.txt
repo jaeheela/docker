@@ -10,7 +10,7 @@ docs.docker.com > docker CLI > docker pull
 # docker pull httpd (httpd 이미지 다운)
 # docker images (httpd 이미지 다운 잘 받았는지 확인)
 # docker run --name ws1 httpd(이미지를 컨테이너로 만듦, 여러 컨테이너로 만들 수 있기 때문에 이름 지정 가능)
-# ocker run --name ws2 httpd
+# docker run --name ws2 httpd
 # docker ps(만든 컨테이너 확인)
 # docker stop ws2(실행 중인 컨테이너 중지)
 # docker start ws2(실행 중인 컨테이너 재실행)
@@ -58,6 +58,6 @@ Web browser : http://localhost:8081/index.html 요청
 <호스트와 컨테이너의 파일 시스템 연결>
 호스트의 파일시스템 : /Desktop/htdocs/index.html
 컨테이너의 파일시스템 : /usr/local/apache2/htdocs/index.html
-# ddocker run -p 8888:80 -v ~/Desktop/htdocs/:/usr/local/apache2/htdocs/ httpd
+# docker run -p 8888:80 -v ~/Desktop/htdocs/:/usr/local/apache2/htdocs/ httpd
 
-Https://seomal.com/map/1/129
+https://seomal.com/map/1/129
