@@ -1,0 +1,19 @@
+### docker가 실행되고 있는지 알 수 있는 명령어
+✅ 1. Docker 데몬이 실행 중인지 확인
+docker info
+정상적으로 실행 중이면 시스템 정보가 쭉 출력돼요.
+실행 중이 아니면 "Cannot connect to the Docker daemon" 같은 오류가 뜹니다.
+
+✅ 2. Docker 버전 확인 (간단 확인용)
+docker version
+Client와 Server 정보가 모두 나와야 정상이에요.
+
+✅ 3. 실행 중인 컨테이너 확인
+docker ps
+현재 실행 중인 컨테이너 목록이 나옵니다.
+아무 것도 안 나오면 실행 중인 컨테이너가 없는 것뿐, Docker는 켜져 있을 수 있어요.
+
+✅ 4. (Linux에서만) Docker 데몬 상태 확인
+systemctl status docker
+"active (running)"이면 실행 중
+Windows나 macOS에서는 Docker Desktop 앱이 켜져 있어야 해요
