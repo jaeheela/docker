@@ -1,0 +1,63 @@
+### ✅ 1. Docker 설치
+아직 설치 안 했다면 https://www.docker.com 가서 Docker Desktop 설치
+
+### ✅ 2. 터미널에서 MySQL 컨테이너 실행
+docker run --name mysql-test \
+  -e MYSQL_ROOT_PASSWORD=your_password \
+  -e MYSQL_DATABASE=testdb \
+  -p 3306:3306 \
+  -d mysql:8.0
+🔍 옵션 설명:
+--name mysql-test: 컨테이너 이름
+-e MYSQL_ROOT_PASSWORD=your_password: 루트 비밀번호 지정
+-e MYSQL_DATABASE=testdb: 자동으로 생성할 DB 이름
+-p 3306:3306: 로컬의 3306 포트를 컨테이너와 연결
+-d mysql:8.0: MySQL 8.0 이미지를 백그라운드 실행
+
+### ✅ 3. MySQL 접속
+- 방법 1: Docker 컨테이너 안으로 접속
+docker exec -it mysql-test mysql -uroot -p
+비밀번호: 위에서 설정한 your_password
+
+- 방법 2: DBeaver / MySQL Workbench 같은 툴로 접속
+호스트: localhost
+포트: 3306
+사용자: root
+비밀번호: your_password
+
+### ✅ 4. 정지 및 삭제
+컨테이너 중지:
+docker stop mysql-test
+컨테이너 삭제:
+docker rm mysql-test
+🔁 데이터 유지하고 싶다면?
+볼륨을 추가해서 데이터가 컨테이너 삭제 후에도 남게 할 수 있어요:
+docker run --name mysql-persist \
+  -e MYSQL_ROOT_PASSWORD=your_password \
+  -e MYSQL_DATABASE=testdb \
+  -p 3306:3306 \
+  -v mysql_data:/var/lib/mysql \
+  -d mysql:8.0
+원하는 환경(로그 확인, 락 실습 등)도 다 가능
+락 충돌이나 백업 복원 테스트도 진짜처럼 가능
+
+### docker가 실행되고 있는지 알 수 있는 명령어
+✅ 1. Docker 데몬이 실행 중인지 확인
+docker info
+정상적으로 실행 중이면 시스템 정보가 쭉 출력돼요.
+실행 중이 아니면 "Cannot connect to the Docker daemon" 같은 오류가 뜹니다.
+
+✅ 2. Docker 버전 확인 (간단 확인용)
+docker version
+Client와 Server 정보가 모두 나와야 정상이에요.
+
+✅ 3. 실행 중인 컨테이너 확인
+docker ps
+현재 실행 중인 컨테이너 목록이 나옵니다.
+아무 것도 안 나오면 실행 중인 컨테이너가 없는 것뿐, Docker는 켜져 있을 수 있어요.
+
+✅ 4. (Linux에서만) Docker 데몬 상태 확인
+systemctl status docker
+"active (running)"이면 실행 중
+Windows나 macOS에서는 Docker Desktop 앱이 켜져 있어야 해요
+
