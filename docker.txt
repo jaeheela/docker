@@ -1,63 +1,95 @@
-App Store -> program -> process
-Docker Hub -> image -> container
+🐳 Docker를 이용한 Apache 웹서버 컨테이너 실행 가이드
+🧠 개념 정리
+
+### 구분	의미
+App Store → Program → Process	: 일반적인 앱 실행 흐름
+Docker Hub → Image → Container : Docker의 실행 흐름
+
+Docker Hub (Explore) : 컨테이너용 프로그램(예: Apache 웹서버)을 이미지로 검색 및 다운로드
+컨테이너 이미지를 기반으로 실행되는 독립된 실행 환경
+
+### 🔧 주요 Docker 명령어
+1. 이미지 다운로드 및 확인
+docker pull httpd                  # Apache (httpd) 이미지 다운로드
+docker images                      # 다운로드된 이미지 목록 확인
+docker rmi httpd                  # httpd 이미지 제거
+
+2. 컨테이너 실행 및 관리
+docker ps                         # 실행 중인 컨테이너 목록 확인
+
+docker run --name ws1 httpd       # 'ws1' 이름으로 컨테이너 생성 및 실행
+docker stop ws1                   # ws1 컨테이너 중지
+docker start ws1                  # ws1 컨테이너 재시작
+docker rm ws1                     # ws1 컨테이너 제거
+docker rm --force ws1             # ws1 컨테이너 실행 중이어도 강제 제거
+
+docker run --name ws2 httpd       # 'ws2' 이름으로 컨테이너 생성 및 실행
+docker stop ws2                   # ws2 컨테이너 중지
+docker start ws2                  # ws2 컨테이너 재시작
+docker rm ws2                     # ws2 컨테이너 제거
+docker rm --force ws2             # ws2 컨테이너 실행 중이어도 강제 제거
+
+docker logs ws2                   # ws2 로그 확인
+docker logs -f ws2                # ws2 로그 실시간 보기
 
 
-Docker Hub > Explore > Containers > 아파치웹서버 프로그램을 컨테이너 위에서 실행 시킬 것임 > 아파치웹서버가 설치된 컨테이너(httpd)
-docs.docker.com > docker CLI > docker pull
+### 🌐 웹 요청 흐름 비교
+1. 직접 설치한 경우
+웹브라우저: http://example.com:80/index.html
+→ Web Server (포트 80 대기)
+→ 파일 시스템: /usr/local/apache2/htdocs/index.html
+
+2. Docker로 실행한 경우
+웹브라우저: http://example.com:80/index.html
+→ Docker Host (운영체제)
+→ Container (ws1) 내 웹서버 (포트 80 대기)
+→ 파일 시스템: /usr/local/apache2/htdocs/index.html
+👉 중요: Docker Host의 포트와 Container의 포트를 연결해야 외부에서 접근 가능함 → 포트 포워딩
 
 
-명령어
-# docker pull httpd (httpd 이미지 다운)
-# docker images (httpd 이미지 다운 잘 받았는지 확인)
-# docker run --name ws1 httpd(이미지를 컨테이너로 만듦, 여러 컨테이너로 만들 수 있기 때문에 이름 지정 가능)
-# docker run --name ws2 httpd
-# docker ps(만든 컨테이너 확인)
-# docker stop ws2(실행 중인 컨테이너 중지)
-# docker start ws2(실행 중인 컨테이너 재실행)
-# docker logs ws2(ws2 컨테이너 로그 확인)
-# docker logs -f ws2(ws2 컨테이너 로그 실시간 확인)
-# docker rm ws2(ws2 컨테이너 제거)
-# docker rm --force ws2(ws2 컨테이너 강제 제거)
-# docker rmi httpd (httpd 이미지 제거)
-
-<컴퓨터에 웹서버를 직접 설치한 경우>
-Web browser : http://example.com:80/index.html 요청
-- example.com > Web Server(웹서버는 80 포트에서 대기 중) > file System : user/local/apache2/htdocs/index.html
-
-<Docker를 이용해 Container에 웹서버가 설치된 경우>
-Web browser : http://example.com:80/index.html 요청
-- Docker Host(컨테이너 설치된 운영체제) > file System
-- Docker Host(컨테이너 설치된 운영체제) > 다수의 container(ws1) > Web Server(웹서버는 80 포트에서 대기 중) > file System : user/local/apache2/htdocs/index.html 
-- Docker Host의 80번 포트와 Container의 80번 포트 연결!! => 포트포워딩
-# docker run httpd
-# docker run -p (호스트의 포트):(컨테이너의 포트) httpd
-# docker run -p 80:80 httpd (포트포워딩)
+### 🔌 포트 포워딩 실습 (컨테이너 실행 및 관리)
+docker run httpd                                # 기본 실행 (외부 접근 불가)
+docker run -p 80:80 httpd                       # 외부 80 → 컨테이너 80 포트 포워딩
+docker run -p 8080:80 httpd                     # 외부 8080 → 컨테이너 80 포트 포워딩
+docker run --name ws3 -p 8081:80 httpd          # 이름 지정 + 외부 8081 → 컨테이너 80 포트 포워딩
 
 
-Web browser : http://localhost:8080/index.html 요청
-# docker run -p 8080:80 httpd
+### 📌 브라우저 접속 예:
+http://localhost:80/index.html
+http://localhost:8080/index.html
+http://localhost:8081/index.html
 
 
-Web browser : http://localhost:8081/index.html 요청
-# docker run --name ws3 -p 8081:80 httpd
+### ✏️ 컨테이너 내부 파일 수정 (index.html 등)
+docker exec ws3 pwd                             # 컨테이너 내부 현재 경로 확인
+docker exec ws3 ls                              # 내부 파일 리스트 확인
+docker exec -it ws3 /bin/sh                     # 쉘 접속
+cd /usr/local/apache2/htdocs/                   # index.html 경로 이동
+apt update && apt install nano                  # 편집기 설치 (필요시)
+apt install -y vim-tiny                         # vi 설치
+apt install -y vim                              # vim 전체 패키지 설치
+nano index.html                                 # 파일 수정 : <h3>It is the ws3 container~!!<h3> 작성
+vi index.html
 
 
-<컨테이너의 들어있는 index.html 수정법>
-# docker exec ws3 pwd
-# docker exec ws3 ls
-...
-# docker exec -it ws3 /bin/sh   (ws3 컨테이너 대상으로 명령 내리기 가능해짐)
-# docker exec -it ws3 /bin/bash 
-# pwd
-# ls
-# cd /usr/local/apache2/htdocs/
-# ls
-# apt update
-# apt install nano
+### ✏️ vi 편집기 간단 사용법
+편집 시작	i (insert 모드)
+편집 종료	Esc 누름
+저장하고 종료	:wq + Enter
+종료만 (저장 안 함)	:q! + Enter
 
-<호스트와 컨테이너의 파일 시스템 연결>
-호스트의 파일시스템 : /Desktop/htdocs/index.html
-컨테이너의 파일시스템 : /usr/local/apache2/htdocs/index.html
-# docker run -p 8888:80 -v ~/Desktop/htdocs/:/usr/local/apache2/htdocs/ httpd
+
+### 🔗 호스트와 컨테이너의 파일 시스템 연결 (볼륨 마운트)
+# 호스트 경로: ~/Desktop/htdocs/index.html
+# 컨테이너 경로: /usr/local/apache2/htdocs/index.html
+
+
+### 📌 이 방식은 호스트 파일을 수정하면 컨테이너에도 반영됨.
+docker run -p 8888:80 -v ~/Desktop/htdocs/:/usr/local/apache2/htdocs/ httpd
+
+
+
+
+
 
 https://seomal.com/map/1/129
